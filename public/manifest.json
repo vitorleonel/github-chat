@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Gichat",
   "description": "A simple realtime chat for each GitHub repository",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "homepage_url": "https://www.vitorleonel.com",
   "author": "Vitor Leonel",
   "content_scripts": [
