@@ -2,7 +2,7 @@
   "author": "Vitor Leonel",
   "content_scripts": [
     {
-      "js": ["static/js/main.js"],
+      "js": ["js/main.js"],
       "matches": ["https://github.com/*"],
       "run_at": "document_end"
     }
