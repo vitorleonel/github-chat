@@ -9,7 +9,7 @@ module.exports = function override(config, env) {
 
   config.optimization.runtimeChunk = false;
 
-  config.output.filename = "static/js/[name].js";
+  config.output.filename = "js/[name].js";
 
   return config;
 };

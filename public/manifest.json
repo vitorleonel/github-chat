@@ -1,0 +1,29 @@
+{
+  "author": "Vitor Leonel",
+  "content_scripts": [
+    {
+      "js": ["static/js/main.js"],
+      "matches": ["https://github.com/*"],
+      "run_at": "document_end"
+    }
+  ],
+  "description": "GitHub on steroids",
+  "homepage_url": "https://www.vitorleonel.com",
+  "manifest_version": 2,
+  "name": "Gichat",
+  "version": "1.0.0",
+  "optional_permissions": [
+    "http://*/*",
+    "https://*/*",
+    "webNavigation",
+    "tabs"
+  ],
+  "permissions": [
+    "https://api.github.com/*",
+    "https://github-chat-api.herokuapp.com/*",
+    "storage",
+    "contextMenus",
+    "activeTab"
+  ],
+  "web_accessible_resources": ["*.woff2", "*.png", "*.gif", "*.svg"]
+}
