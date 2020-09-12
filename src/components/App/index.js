@@ -7,7 +7,7 @@ import { Container, Header, Messages, Message, Write } from "./styles";
 
 Pusher.logToConsole = true;
 
-const pusher = new Pusher(process.env.PUSHER_APP_KEY, {
+const pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
   cluster: "us2",
 });
 
