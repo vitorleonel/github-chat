@@ -51,6 +51,19 @@ export const Header = styled.header`
   justify-content: space-between;
   align-items: center;
 
+  h1 {
+    max-width: 88%;
+    display: flex;
+
+    span:first-child {
+      flex: 1;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      padding-right: 4px;
+    }
+  }
+
   svg {
     width: 20px;
     height: 20px;

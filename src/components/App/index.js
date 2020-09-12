@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import uuid from "react-uuid";
 import Pusher from "pusher-js";
 import axios from "axios";
 
 import { Container, Header, Messages, Message, Write } from "./styles";
 
-// Pusher.logToConsole = true;
-
-const pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
-  cluster: "us2",
-});
-
 function App() {
-  const [hidden, setHidden] = useState(false);
+  const [hidden, setHidden] = useState(true);
+  const lastMessage = useRef();
 
   const [repository, setRepository] = useState(null);
   const [user, setUser] = useState(null);
 
+  const [membersTotal, setMembersTotal] = useState(0);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -39,25 +35,47 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!repository) return;
-
-    const channelName = `channel-${repository.replace("/", "-")}`;
-    const channel = pusher.subscribe(channelName);
-
-    channel.bind("messages", (message) =>
-      setMessages((messages) => [...messages, { id: uuid(), ...message }])
-    );
-
-    return () => pusher.unsubscribe(channelName);
-  }, [repository]);
-
-  useEffect(() => {
     const userElement = document.querySelector("header .avatar.avatar-user");
 
     if (!userElement) return;
 
     setUser(userElement.getAttribute("alt").replace("@", ""));
   }, []);
+
+  useEffect(() => {
+    if (!repository || !user) return;
+
+    const pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
+      cluster: "us2",
+      authEndpoint: `${process.env.REACT_APP_PUSHER_APP_ENDPOINT}/pusher/auth?user=${user}`,
+    });
+
+    const channelName = `presence-${repository.replace("/", "-")}`;
+    const channel = pusher.subscribe(channelName);
+
+    channel.bind("pusher:subscription_succeeded", () =>
+      setMembersTotal(channel.members.count)
+    );
+
+    channel.bind("pusher:member_added", () =>
+      setMembersTotal(channel.members.count)
+    );
+
+    channel.bind("pusher:member_removed", () =>
+      setMembersTotal(channel.members.count)
+    );
+
+    channel.bind("messages", (message) => {
+      setMessages((messages) => [...messages, { id: uuid(), ...message }]);
+
+      lastMessage.current.scrollIntoView({ behavior: "smooth" });
+    });
+
+    return () => {
+      pusher.unsubscribe(channelName);
+      pusher.disconnect();
+    };
+  }, [repository, user]);
 
   function sendMessage(event) {
     if (event.which !== 13) {
@@ -71,10 +89,19 @@ function App() {
       return;
     }
 
-    axios.post("https://github-chat-api.herokuapp.com", {
-      data: { author: user, description: newMessage },
-      channel: `channel-${repository.replace("/", "-")}`,
-    });
+    const previewNewMessage = newMessage;
+
+    axios
+      .post(
+        `${
+          process.env.REACT_APP_PUSHER_APP_ENDPOINT
+        }/presence-${repository.replace("/", "-")}`,
+        {
+          author: user,
+          description: newMessage,
+        }
+      )
+      .catch(() => setNewMessage(previewNewMessage));
 
     setNewMessage("");
   }
@@ -84,7 +111,10 @@ function App() {
   return (
     <Container className={hidden && "hidden"}>
       <Header onClick={() => setHidden(!hidden)}>
-        <h1>{repository}</h1>
+        <h1>
+          <span>{repository}</span>
+          <span>({membersTotal})</span>
+        </h1>
 
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -113,6 +143,8 @@ function App() {
               <span>{message.description}</span>
             </Message>
           ))}
+
+          <div ref={lastMessage}></div>
         </Messages>
       )}
 
