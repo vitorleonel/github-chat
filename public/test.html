@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visits</title>
+  </head>
+  <body>
+    <h1>Visits</h1>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js"></script>
+    <script>
+      console.time("visits");
+
+      const urls = [];
+
+      for (i = 0; i < 1000; i++) {
+        urls.push(
+          "https://api.mercadolibre.com/items/MLB984533738/visits/time_window?last=359&unit=day&ending=2020-09-10&attributes=total_visits"
+        );
+      }
+
+      Promise.all(urls.map((u) => axios.get(u)))
+        .then((responses) => Promise.all(responses.map((res) => res.data)))
+        .then((texts) => {
+          console.log(texts);
+          console.timeEnd("visits");
+        });
+    </script>
+  </body>
+</html>
