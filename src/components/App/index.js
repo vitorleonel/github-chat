@@ -5,7 +5,7 @@ import axios from "axios";
 
 import { Container, Header, Messages, Message, Write } from "./styles";
 
-Pusher.logToConsole = true;
+// Pusher.logToConsole = true;
 
 const pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
   cluster: "us2",
@@ -27,7 +27,9 @@ function App() {
       );
 
       if (repositoryElement) {
-        setRepository(repositoryElement.getAttribute("href").replace(/\//, ""));
+        setRepository(
+          repositoryElement.getAttribute("href").replace(/\//, "").toLowerCase()
+        );
       }
 
       setTimeout(defineRepository, 5000);
